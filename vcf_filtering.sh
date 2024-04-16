@@ -19,6 +19,12 @@ vcftools --gzvcf $SUBSET_VCF --site-mean-depth --out $OUT
 # proportion of missing data per site
 vcftools --gzvcf $SUBSET_VCF --missing-site --out $OUT
 
+# no need to do above, can just use the results from qualimap
+# Warning: Expected at least 2 parts in INFO entry: ID=SGB,Number=1,Type=Float,Description="Segregation based metric, http://samtools.github.io/bcftools/rd-SegBias.pdf">
+# Warning: Expected at least 2 parts in INFO entry: ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes for each ALT allele, in the same order as listed">
+# Warning: Expected at least 2 parts in INFO entry: ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
+# Warning: Expected at least 2 parts in INFO entry: ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
+
 
 # set missingness and DP cutoff
 # filter VCF
