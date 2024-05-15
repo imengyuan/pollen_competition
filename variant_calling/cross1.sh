@@ -10,14 +10,14 @@ M F
 # might be ready to run at the end of the day
 
 # leaf
+# use freebayes instead of mpileup
 ref=/ohta2/meng.yuan/rumex/pollen_competition/NC/genome/NChap1_final.fa
 bamlist=/ohta2/meng.yuan/rumex/pollen_competition/NC/pollenLD_hap1_test.txt
-output=/ohta2/meng.yuan/rumex/pollen_competition/vcf/pollenLD_31c_30a_hap1_new.vcf.gz
-bcftools mpileup -a DP -B -I -f ${ref} -b ${bamlist} --threads 20 | bcftools call -f GQ --threads 20 -m -O z -o ${output}
+output=/ohta2/meng.yuan/rumex/pollen_competition/vcf/pollenLD_31c_30a_hap1.vcf.gz
+bcftools mpileup -a DP -B -I -f ${ref} -b ${bamlist} --threads 20 | bcftools call --threads 20 -m -O z -o ${output}
 
 # so we have FMT/DP
 # /ohta2/meng.yuan/rumex/pollen_competition/vcf/pollenLD_31c_30a_hap1.vcf.gz
-bcftools mpileup -f my_ref.fa my_bam.bam | bcftools call -m -Oz -f GQ -o my_vcf.gz
 
 
 
@@ -41,7 +41,6 @@ do
 bcftools mpileup -a DP,AD -d 5000 -Ov -f ${ref} ${in}/${i}.sorted.rg.dedup.bam --threads 20 \
 | bgzip > ${out}/${i}.pileup.vcf.gz
 done
-
 
 
 
@@ -155,6 +154,3 @@ vcf_out=/ohta2/meng.yuan/rumex/pollen_competition/cross/corss1_31c_30a_hap1_new.
 
 X       595     C       A,<*>   0/0:17:.        0/0:33:.        ./.:110:109,1,0 ./.:130:129,1,0
 X       596     C       T,A,<*> 0/0:18:.        0/0:33:.        ./.:111:109,1,1,0       ./.:130:128,.,2,0
-
-
-
