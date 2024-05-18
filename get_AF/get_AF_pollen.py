@@ -1,5 +1,5 @@
 # calculate AF in pollen and dad in sliding windows
-# usage: python3 get_AF.py XX.vcf
+# usage: python3 get_AF.py XX.vcf A1 1890
 # X       22606   G       A       0/1     5       3       0/1     66      13
 
 import sys
@@ -63,7 +63,7 @@ with open(vcf_file, "r") as f_in:
     start = (n - 1) * step + start_pos
     end = start + window - 1
     dad_freq, pollen_freq = calculate_freq(dad_0, dad_1, pollen_0, pollen_1)
-    result_list.append([chrom, str(start), str(end), str(dad_freq), str(pollen_freq)])
+    result_list.append([chrom, str(start), str(end), str(no_sites), str(dad_freq), str(pollen_freq)])
 
 for result in result_list:
     print("\t".join(result), file=f_out)

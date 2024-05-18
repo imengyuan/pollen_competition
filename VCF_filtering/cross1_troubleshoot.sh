@@ -87,3 +87,17 @@ bcftools merge ${vcf_out_dad} ${vcf_out_pollen}  --threads 20 \
 sed -i 's/\,/\t/g' cross1_31c_30a_hap1_pollen.vcf
 
 
+grep "A4" cross1_31c_30a_hap1_pollen.vcf > cross1_31c_30a_hap1_pollen_A4.vcf
+
+
+
+
+python3  ~/Git/pollen_competition/get_AF/get_AF_pollen.py cross1_31c_30a_hap1_pollen_X.vcf X 22513
+python3  ~/Git/pollen_competition/get_AF/get_AF_pollen.py cross1_31c_30a_hap1_pollen_A1.vcf A1 9298
+python3  ~/Git/pollen_competition/get_AF/get_AF_pollen.py cross1_31c_30a_hap1_pollen_A2.vcf A2 66200
+python3  ~/Git/pollen_competition/get_AF/get_AF_pollen.py cross1_31c_30a_hap1_pollen_A4.vcf A4 13765
+
+
+
+
+

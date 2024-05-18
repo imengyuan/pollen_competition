@@ -81,6 +81,23 @@ sed -i 's/\,/\t/g' cross5_35h_02g_pollen.vcf
 
 
 
+grep "A1" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_A1.vcf
+grep "A2" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_A2.vcf
+grep "A3" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_A3.vcf
+grep "A4" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_A4.vcf
+grep "X" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_X.vcf
+grep "Y" cross5_35h_02g_pollen.vcf > cross5_35h_02g_pollen_Y.vcf
+
+head -n 1 *.vcf
+
+python3  get_AF_pollen.py cross5_35h_02g_pollen_A1.vcf A1 74101
+python3  get_AF_pollen.py cross5_35h_02g_pollen_A2.vcf A2 14628
+python3  get_AF_pollen.py cross5_35h_02g_pollen_A3.vcf A3 15566
+python3  get_AF_pollen.py cross5_35h_02g_pollen_A4.vcf A4 15402
+python3  get_AF_pollen.py cross5_35h_02g_pollen_X.vcf X 768
+python3  get_AF_pollen.py cross5_35h_02g_pollen_Y.vcf Y 24733
+
+
 
 
 # [pollen4]
@@ -150,10 +167,6 @@ bcftools merge ${vcf_out_dad} ${vcf_out_pollen}  --threads 20 \
 | bcftools filter -e 'FMT/DP="."' | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT\t%AD]\n' > ${vcf_out3}
 
 sed -i 's/\,/\t/g' ${vcf_out3}
-
-
-
-
 
 
 
