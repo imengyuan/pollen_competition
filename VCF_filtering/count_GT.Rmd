@@ -1,0 +1,62 @@
+---
+title: "count GT"
+author: "Meng"
+date: "2024-05-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+
+```{r}
+GT1 <- read.table("/Users/yuanmeng/Downloads/cross1_31c_30a_hap1_GT2.vcf")
+GT1$V1 <- factor(GT1$V1)
+#levels(GT1$V1)
+#table(GT1$V1)
+
+table(GT1$V9)
+table(GT1$V11)
+
+test <- GT1 %>% filter(V1 == "A1")
+table(test$V11)
+
+```
+ seed
+ GT2
+ 
+ 
+ 
+ 
+ 
+ [pollen] 
+ GT2
+ 0/1  1/1 
+  48 6297 
+ 0/1  1/1 
+  14 2873
+ 0/1  1/1 
+  17 2202
+0/1  1/1 
+  20 2420 
+  
+GT1  
+0/0  0/1 
+7336    2
+ 0/0  0/1 
+4346    6
+ 0/0  0/1 
+1214    1
+ 0/0  0/1 
+2422    2
+
+
+A1            A2            A4 scaffold_1077    scaffold_5 
+         7338          4352          1215             3             1 
+  scaffold_73   scaffold_89             X 
+            4             2          2424 
+
+A1          A2          A4  scaffold_5 scaffold_73           X 
+       6345        2887        2219           1           4        2440
