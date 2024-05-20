@@ -83,5 +83,20 @@ snakemake -c2 -s Snakefile
 
 
 
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleLD.txt)
+do
+qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam \
+--java-mem-size=16G -outdir ${out}/${i}
+done
+
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+for i in "02gSD" "35hPD" "36bSD" "58bPD"
+do
+qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam \
+--java-mem-size=16G -outdir ${out}/${i}
+done
 
 

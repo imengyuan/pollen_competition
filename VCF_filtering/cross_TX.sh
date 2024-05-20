@@ -169,6 +169,21 @@ bcftools merge ${vcf_out_dad} ${vcf_out_pollen}  --threads 20 \
 sed -i 's/\,/\t/g' ${vcf_out3}
 
 
+grep "A1" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_A1.vcf
+grep "A2" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_A2.vcf
+grep "A3" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_A3.vcf
+grep "A4" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_A4.vcf
+grep "X" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_X.vcf
+grep "Y" cross7_58b_36b_pollen.vcf > cross7_58b_36b_pollen_Y.vcf
+
+head -n 1 *.vcf
+
+python3  get_AF_pollen.py cross7_58b_36b_pollen_A1.vcf A1 24533
+python3  get_AF_pollen.py cross7_58b_36b_pollen_A2.vcf A2 13776
+python3  get_AF_pollen.py cross7_58b_36b_pollen_A3.vcf A3 15085
+python3  get_AF_pollen.py cross7_58b_36b_pollen_A4.vcf A4 7557
+python3  get_AF_pollen.py cross7_58b_36b_pollen_X.vcf X 839
+python3  get_AF_pollen.py cross7_58b_36b_pollen_Y.vcf Y 5283
 
 
 

@@ -72,3 +72,30 @@ p2 <- ggplot(freq_long_cross5, aes(x = start/1000000, y = freq))+geom_point(aes(
 p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
 ```
 
+
+# cross 7, TX
+```{r}
+freq1 <- read.table(paste0(data,"cross7_58b_36b_pollen_A1.vcf.freq"), header =T)
+freq2 <- read.table(paste0(data,"cross7_58b_36b_pollen_A2.vcf.freq"), header =T)
+freq3 <- read.table(paste0(data,"cross7_58b_36b_pollen_A3.vcf.freq"), header =T)
+freq4 <- read.table(paste0(data,"cross7_58b_36b_pollen_A4.vcf.freq"), header =T)
+freq5 <- read.table(paste0(data,"cross7_58b_36b_pollen_X.vcf.freq"), header =T)
+freq6 <- read.table(paste0(data,"cross7_58b_36b_pollen_Y.vcf.freq"), header =T)
+
+freq_cross7 <- rbind(freq1, freq2, freq3, freq4, freq5, freq6)
+freq_cross7 <- freq_cross7 %>% filter(no_sites > 50)
+freq_cross7$chrom <- factor(freq_cross7$chrom)
+
+freq_long_cross7 <- gather(freq_cross7, Category, freq, dad_freq : pollen_freq, factor_key = TRUE)
+levels(freq_long_cross7$Category) <- c("dad", "pollen")   
+```
+
+```{r}
+p1 <- ggplot(freq_cross7, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3)+ geom_smooth()+
+    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
+    xlab("Position on Chromosome (Mb)")+ylab("no_sites")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+
+p2 <- ggplot(freq_long_cross7, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+
+p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
+```
