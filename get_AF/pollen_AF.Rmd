@@ -45,6 +45,7 @@ p2 <- ggplot(freq_long, aes(x = start/1000000, y = freq))+geom_point(aes(colour 
 p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
 ```
 
+
 # cross 5, TX
 ```{r}
 freq1 <- read.table(paste0(data,"cross5_35h_02g_pollen_A1.vcf.freq"), header =T)
@@ -87,15 +88,22 @@ freq_cross7 <- freq_cross7 %>% filter(no_sites > 50)
 freq_cross7$chrom <- factor(freq_cross7$chrom)
 
 freq_long_cross7 <- gather(freq_cross7, Category, freq, dad_freq : pollen_freq, factor_key = TRUE)
-levels(freq_long_cross7$Category) <- c("dad", "pollen")   
+levels(freq_long_cross7$Category) <- c("leaf", "pollen")   
 ```
 
 ```{r}
-p1 <- ggplot(freq_cross7, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3)+ geom_smooth()+
+p1 <- ggplot(freq_cross7, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.2)+ geom_smooth(colour = "black")+
     facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab("Position on Chromosome (Mb)")+ylab("no_sites")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+    xlab(" ")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
 
-p2 <- ggplot(freq_long_cross7, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+p2 <- ggplot(freq_long_cross7, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
 
 p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
 ```
+
+
+## seed
+```{r}
+
+```
+

@@ -4,11 +4,28 @@
 ref=/ohta2/meng.yuan/rumex/pollen_competition/genomeTX/merged_TX_noMatPAR.fa
 in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX/
 out=/ohta2/meng.yuan/rumex/pollen_competition/VCF_cross/
-for i in "35hPD" "58bPD"
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/samplePD2.txt)
 do
 bcftools mpileup -a DP,AD -d 5000 -Ov -f ${ref} ${in}/${i}.sorted.rg.dedup.bam --threads 20 \
 | bgzip > ${out}/${i}.pileup.vcf.gz
 done
+
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX/
+out=/ohta2/meng.yuan/rumex/pollen_competition/VCF_cross/
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleSD2.txt)
+do
+bcftools mpileup -a DP,AD -d 5000 -Ov -f ${ref} ${in}/${i}.sorted.rg.dedup.bam --threads 20 \
+| bgzip > ${out}/${i}.pileup.vcf.gz
+done
+
+
+
+# all 40 samples for  [pollen2]
+ref=/ohta2/meng.yuan/rumex/pollen_competition/genomeTX/merged_TX_noMatPAR.fa
+bamlist=/ohta2/meng.yuan/rumex/pollen_competition/bam_TX.txt
+output=/ohta2/meng.yuan/rumex/pollen_competition/VCF_cross/TX_40samples_GT.vcf.gz
+bcftools mpileup -a DP,AD -d 5000 -B -I -f ${ref} -b ${bamlist} --threads 20 \
+| bcftools call -f GQ --threads 20 -mv -O z -o ${output}
 
 
 
