@@ -10,6 +10,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(patchwork)
+library(data.table)
 data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
 ```
 
@@ -43,6 +44,7 @@ fisher_test <- function(dad0, dad1, pollen0, pollen1) {
 cross7[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7)]
 
 write.table(cross7, file=paste0(data, "cross7.txt"), quote = F, row.names = F,sep = "\t")
+cross7 <- read.table(paste0(data, "cross7.txt"), header = T)
 
 cross7_A1 <- cross7 %>% filter(chrom == "A1")
 cross7_A2 <- cross7 %>% filter(chrom == "A2")
@@ -68,5 +70,73 @@ use the same ylim, remove y axis, can pretend to be factes!!
 ggplot(cross7, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on chromosome (Mb)")+ylab("-log10(p)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) 
 
 summary(cross7_A2$p_value)
+```
+```{r}
+ggplot(cross7_A4, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab(" ")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9) + xlim(51.5,52.5)
+```
+
+cross5
+
+```{r}
+cross5 <- read.table(paste0(data,"cross5_35h_02g_pollen.vcf"))
+colnames(cross5) <- c("chrom", "pos", "ref", "alt", "dad", "dad0", "dad1", "pollen", "pollen0", "pollen1")
+head(cross7)
+cross7 <- cross7 %>% filter(chrom != "X" & chrom != "Y")
+cross7$chrom <- factor(cross7$chrom)
+levels(cross7$chrom)
+```
+
+```{r}
+cross5_A4 <- cross5 %>% filter(chrom == "A4")
+cross5 <- as.data.table(cross5)
+cross5_A1 <- cross5 %>% filter(chrom == "A1")
+cross5_A2 <- cross5 %>% filter(chrom == "A2")
+cross5_A3 <- cross5 %>% filter(chrom == "A3")
+
+
+fisher_test <- function(dad0, dad1, pollen0, pollen1) {
+    values <- c(dad0, dad1, pollen0, pollen1)
+    contingency_table <- matrix(values, nrow = 2, byrow = TRUE)
+    test_result <- fisher.test(contingency_table)
+    odds_ratio <- test_result$estimate
+    p_value <- test_result$p.value
+    return(list(odds_ratio = odds_ratio, p_value = p_value))
+}
+
+cross5_A4[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross5_A4)]
+cross5_A3[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross5_A3)]
+
+
+cross5_A1[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross5_A1)]
+cross5_A2[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross5_A2)]
+
+
+
+
+write.table(cross5_A4, file=paste0(data, "cross5_A4"), quote = F, row.names = F,sep = "\t")
+write.table(cross5_A1, file=paste0(data, "cross5_A1"), quote = F, row.names = F,sep = "\t")
+write.table(cross5_A2, file=paste0(data, "cross5_A2"), quote = F, row.names = F,sep = "\t")
+write.table(cross5_A3, file=paste0(data, "cross5_A3"), quote = F, row.names = F,sep = "\t")
+
+
+cross5_A4<- read.table(paste0(data, "cross5_A4"), header = T)
+cross7 <- read.table(paste0(data, "cross7.txt"), header = T)
+
+
+```
+
+```{r}
+p1 <- ggplot(cross5_A1, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab("-log10(p)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
+
+p2 <- ggplot(cross5_A2, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab(" ")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
+
+p3 <- ggplot(cross5_A3, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab(" ")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
+
+p4 <- ggplot(cross5_A4, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab(" ")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
+
+p1 + p2 + p3 + p4 +plot_layout(nrow = 1) 
+```
+```{r}
+p1
 ```
 
