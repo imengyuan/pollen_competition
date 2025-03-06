@@ -1,91 +1,69 @@
-# evaluate mapping stats for SD and PD samples
-# hap 1
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap1
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap1
+# use qualimap bamqc to extract mean coverage from BAMs
+
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
 for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleSD.txt)
 do
-qualimap bamqc -bam ${in}/${i}_hap1.sorted.rg.dedup.bam \
+qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam \
 --java-mem-size=16G -outdir ${out}/${i}
 done
 
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap1
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap1
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
 for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/samplePD.txt)
 do
-qualimap bamqc -bam ${in}/${i}_hap1.sorted.rg.dedup.bam \
+qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam \
 --java-mem-size=16G -outdir ${out}/${i}
 done
 
+# for a plot
+# out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+# in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+# for i in "36bSD" "58bPD"
+# do
+# qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam -c \
+# /ohta2/meng.yuan/rumex/pollen_competition/chrom.bed \
+# --java-mem-size=16G -outdir ${out}/${i}
+# done
 
-# hap2
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap2
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap2
-for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleSD.txt)
-do
-qualimap bamqc -bam ${in}/${i}_hap2.sorted.rg.dedup.bam \
---java-mem-size=16G -outdir ${out}/${i}
-done
 
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap2
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap2
+# try tinycov for a plot
+# out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+# in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+# for i in "36bFLD" "58bMLD" "36bSD" "58bPD"
+# do
+# tinycov covplot ${in}/${i}.sorted.rg.dedup.bam \
+# --out ${out}/${i}.pdf -s 1000 -r 1000000 --whitelist A1,A2,A3,A4,Y,X
+# done
+
+
+
+
+## get a summary of coverage from bamqc output
+# PD and MLD
+cd /ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+
+output_file="PD_auto_coverage.txt" 
+echo -e "sample\t_coverage" > $output_file 
+
 for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/samplePD.txt)
 do
-qualimap bamqc -bam ${in}/${i}_hap2.sorted.rg.dedup.bam \
---java-mem-size=16G -outdir ${out}/${i}
+file=${i}/genome_results.txt
+num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
+echo -e "${i}\t${num}" >> $output_file
 done
 
 
-# evaluate mapping stats for LD samples
-# hap 1
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap1
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap1
-for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleLD.txt)
+
+output_file="MLD_auto_coverage.txt" 
+echo -e "sample\t_coverage" > $output_file 
+ 
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleMLD.txt)
 do
-qualimap bamqc -bam ${in}/${i}_hap1.sorted.rg.dedup.bam \
---java-mem-size=16G -outdir ${out}/${i}
+file=${i}/genome_results.txt
+num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
+echo -e "${i}\t${num}" >> $output_file
 done
-
-# hap2
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap2
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap2
-for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleLD.txt)
-do
-qualimap bamqc -bam ${in}/${i}_hap2.sorted.rg.dedup.bam \
---java-mem-size=16G -outdir ${out}/${i}
-done
-
-     # mean coverageData = 100.3915X
-     # std coverageData = 314.1187X # maybe separately
-## get a summary of coverage
-# check individual hmtl reports
-cd /ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap1
-for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/samplePD.txt)
-do
-#echo ${i}
-grep 'mean coverageData' ${i}/genome_results.txt | cut -c 26-100 
-done
-
-
-out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_hap2
-in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_hap2
-i=35gFLD 
-qualimap bamqc -bam ${in}/${i}_hap2.sorted.rg.dedup.bam \
---java-mem-size=16G -outdir ${out}/${i}
-
-
-hap1 
-X, A4, A1, A2
-
-hap2 
-A4, Y2, A1, Y1, A2
-
-
-
-
-
-
-
-
 
 
 
