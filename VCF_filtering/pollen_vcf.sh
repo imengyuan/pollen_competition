@@ -1,13 +1,8 @@
-# extract ready-to-use VCF for each cross
-# cross2 02f	24a
-# maybe write a snakemake pipeline
-
-# testing pollen_vcf.sh on one sample
-id=2
-male=02f
+id="$1"
+male="$2"
 # DP threshold, 2*mean in the sample
-DP_leaf=38
-DP_pollen=160
+DP_leaf="$4"
+DP_pollen="$3"
 
 vcf_in=/ohta2/meng.yuan/rumex/pollen_competition/VCF_cross/TX_40samples_GT.vcf.gz
 vcf_leaf=/ohta2/meng.yuan/rumex/pollen_competition/cross_TX/${male}MLD.filt.vcf.gz
@@ -29,25 +24,4 @@ tabix ${vcf_pollen}
 # merge VCFs
 bcftools merge ${vcf_leaf} ${vcf_pollen}  --threads 20 \
 | bcftools filter -e 'FMT/DP="."' | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT\t%AD]\n' > ${vcf_out}
-
-
-while read -r col1 col2 _ _ col5 col6 _; do
-    sh pollen_vcf.sh "$col1" "$col2" "$col5" "$col6"
-done < pollen_auto_cov.txt
-
-######################################################################
-# make separate VCF of each chrom for windowed analyses
-id=2
-dad=02f
-for i in "A1" "A2" "A3" "A4" "X" "Y"
-do
-grep ${i} cross${id}_${dad}_pollen.vcf > cross${id}_${dad}_pollen_${i}.vcf
-# get the sliding window start position for each chrom
-start_pos=$(head -n 1 cross${id}_${dad}_pollen_${i}.vcf | cut -f2)
-
-python3  get_AF_pollen.py cross${id}_${dad}_pollen_${i}.vcf ${i} ${start_pos} 
-done
-
-cat cross${id}_${dad}_pollen_*.vcf.freq > cross${id}_${dad}_pollen.vcf.freq
-
 

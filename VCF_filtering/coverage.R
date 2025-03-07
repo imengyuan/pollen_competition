@@ -9,4 +9,4 @@ cov$DP_leaf <- floor(cov$DP_leaf)
 # get cross id
 id <- read.table("id_sample.txt", header = T)
 cov <- inner_join(id, cov, by = "sample")
-
+write.table(cov, file = "pollen_auto_cov.txt", quote = F, row.names = F, sep = "\t")
