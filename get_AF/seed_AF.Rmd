@@ -1,0 +1,36 @@
+---
+title: "seed AF"
+author: "Meng"
+date: "2025-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
+
+```
+
+```{r}
+
+freqseed <- read.table(paste0(data,"cross5_35h_02g_seed.vcf.freq"))
+colnames(freqseed) <- c("chrom", "start", "end","no_sites", "freq_mom", "freq_seed")
+freqseed <- freqseed %>% filter(no_sites > 50)
+freqseed$chrom <- factor(freqseed$chrom)
+
+freqseed_long <- gather(freqseed, Category, freq, freq_mom : freq_seed, factor_key = TRUE)
+levels(freqseed_long$Category) <- c("leaf", "seed")   
+freqseed_long <- freqseed_long %>% filter(chrom != "X" & chrom != "Y")
+
+p1 <- ggplot(freqseed_long, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.2)+ geom_smooth(colour = "black")+
+    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
+    xlab(" ")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+
+p2 <- ggplot(freqseed_long, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+
+p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
+```
+

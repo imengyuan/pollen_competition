@@ -11,27 +11,20 @@ library(dplyr)
 library(tidyr)
 library(patchwork)
 library(data.table)
-data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
+library(stringr)
+setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
 ```
 
 ```{r}
-cross7 <- read.table(paste0(data,"cross7_58b_36b_pollen.vcf"))
+cross7 <- read.table(paste0(data,"cross7_58b_pollen.vcf"))
 colnames(cross7) <- c("chrom", "pos", "ref", "alt", "dad", "dad0", "dad1", "pollen", "pollen0", "pollen1")
 head(cross7)
-cross7 <- cross7 %>% filter(chrom != "X" & chrom != "Y")
+cross7 <- cross7 %>% filter(str_starts(chrom, "A"))
 cross7$chrom <- factor(cross7$chrom)
 levels(cross7$chrom)
-# cross7$freq_ref_p <- cross7$pollen0 / (cross7$pollen1 + cross7$pollen0)
-# sort(cross7$freq_ref_p)[.95*length(cross7$freq_ref_p)] 
-# sort(cross7$freq_ref_p)[.05*length(cross7$freq_ref_p)] 
-# 
-# summary(cross7$freq_ref_p)
-```
-Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.0000  0.4831  0.5426  0.5610  0.6279  1.0000 
  
-```{r}
 cross7 <- as.data.table(cross7)
+
 fisher_test <- function(dad0, dad1, pollen0, pollen1) {
     values <- c(dad0, dad1, pollen0, pollen1)
     contingency_table <- matrix(values, nrow = 2, byrow = TRUE)
@@ -43,18 +36,27 @@ fisher_test <- function(dad0, dad1, pollen0, pollen1) {
 
 cross7[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7)]
 
-write.table(cross7, file=paste0(data, "cross7.txt"), quote = F, row.names = F,sep = "\t")
+write.table(cross7, file=paste0(data, "cross7_fishertest.txt"), quote = F, row.names = F,sep = "\t")
 cross7 <- read.table(paste0(data, "cross7.txt"), header = T)
 
 cross7_A1 <- cross7 %>% filter(chrom == "A1")
 cross7_A2 <- cross7 %>% filter(chrom == "A2")
 cross7_A3 <- cross7 %>% filter(chrom == "A3")
 cross7_A4 <- cross7 %>% filter(chrom == "A4")
-head(cross7_A4)
+
+
+
+cross7_A4[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7_A4)]
+cross7_A3[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7_A3)]
+cross7_A1[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7_A1)]
+cross7_A2[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross7_A2)]
+
+
+
 ```
  
 ```{r}
-p1 <- ggplot(cross7_A1, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab("-log10(p)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
+p1 <- ggplot(cross7_A3, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3, colour = "darkblue")+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab("-log10(p)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) 
 
 p2 <- ggplot(cross7_A2, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab(" ")+ylab(" ")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) + ylim(0, 9)
 
@@ -64,7 +66,6 @@ p4 <- ggplot(cross7_A4, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(si
 
 p1 + p2 + p3 + p4 +plot_layout(nrow = 1)
 ```
-use the same ylim, remove y axis, can pretend to be factes!!
 
 ```{r}
 ggplot(cross7, aes(x = pos/1000000, y = -log10(p_value)))+geom_point(size = 0.3, alpha=0.3)+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on chromosome (Mb)")+ylab("-log10(p)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10)) 

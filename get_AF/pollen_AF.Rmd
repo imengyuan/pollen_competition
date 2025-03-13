@@ -10,117 +10,32 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(patchwork)
-data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
+setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
 ```
-
-# pollen AF cross 1 NC_hap1
-```{r}
-freq1 <- read.table(paste0(data,"cross1_31c_30a_hap1_pollen_A1.vcf.freq"), header =T)
-freq2 <- read.table(paste0(data,"cross1_31c_30a_hap1_pollen_A2.vcf.freq"), header =T)
-freq3 <- read.table(paste0(data,"cross1_31c_30a_hap1_pollen_A4.vcf.freq"), header =T)
-freq4 <- read.table(paste0(data,"cross1_31c_30a_hap1_pollen_X.vcf.freq"), header =T)
-
-freq <- rbind(freq1, freq2, freq3, freq4)
-freq <- freq %>% filter(no_sites > 50)
-freq$chrom <- factor(freq$chrom)
-```
-
-gather
-```{r}
-freq_long <- gather(freq, Category, freq, dad_freq : pollen_freq, factor_key = TRUE)
-levels(freq_long$Category) <- c("dad", "pollen")   
-```
-
-
-```{r}
-p1 <- ggplot(freq, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3)+ geom_smooth()+
-    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab("Position on Chromosome (Mb)")+ylab("no_sites")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-#p2 <- ggplot(freq, aes(x = start/1000000, y = dad_freq))+geom_point(size = 0.3)+ geom_smooth()+facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab("Position on Chromosome (Mb)")+ylab("dad freq")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p2 <- ggplot(freq_long, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
-```
-
 
 # cross 5, TX
 ```{r}
-freq1 <- read.table(paste0(data,"cross5_35h_02g_pollen_A1.vcf.freq"), header =T)
-freq2 <- read.table(paste0(data,"cross5_35h_02g_pollen_A2.vcf.freq"), header =T)
-freq3 <- read.table(paste0(data,"cross5_35h_02g_pollen_A3.vcf.freq"), header =T)
-freq4 <- read.table(paste0(data,"cross5_35h_02g_pollen_A4.vcf.freq"), header =T)
-freq5 <- read.table(paste0(data,"cross5_35h_02g_pollen_X.vcf.freq"), header =T)
-freq6 <- read.table(paste0(data,"cross5_35h_02g_pollen_Y.vcf.freq"), header =T)
+freq_cross <- read.table("cross5_35h_pollen.vcf.freq")
+colnames(freq_cross) <- c("chrom", "start", "end", "no_sites", "leaf_freq", "pollen_freq")
+freq_cross <- freq_cross %>% filter(no_sites > 100)
+freq_cross$chrom <- factor(freq_cross$chrom)
 
-freq_cross5 <- rbind(freq1, freq2, freq3, freq4, freq5, freq6)
-freq_cross5 <- freq_cross5 %>% filter(no_sites > 50)
-freq_cross5$chrom <- factor(freq_cross5$chrom)
-
-freq_long_cross5 <- gather(freq_cross5, Category, freq, dad_freq : pollen_freq, factor_key = TRUE)
-levels(freq_long_cross5$Category) <- c("dad", "pollen")   
+freq_long_cross <- gather(freq_cross, Category, freq, leaf_freq : pollen_freq, factor_key = TRUE)
+levels(freq_long_cross$Category) <- c("leaf", "pollen")   
 ```
 
 ```{r}
-p1 <- ggplot(freq_cross5, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3)+ geom_smooth()+
+p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3, alpha = 0.8, colour = "darkgrey")+ geom_smooth(colour = "black")+
     facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab("Position on Chromosome (Mb)")+ylab("no_sites")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+    xlab("")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
 
-p2 <- ggplot(freq_long_cross5, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
+p2 <- ggplot(freq_long_cross, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.3)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Allele frequency")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
 
 p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
 ```
 
 
-# cross 7, TX
-```{r}
-freq1 <- read.table(paste0(data,"cross7_58b_36b_pollen_A1.vcf.freq"), header =T)
-freq2 <- read.table(paste0(data,"cross7_58b_36b_pollen_A2.vcf.freq"), header =T)
-freq3 <- read.table(paste0(data,"cross7_58b_36b_pollen_A3.vcf.freq"), header =T)
-freq4 <- read.table(paste0(data,"cross7_58b_36b_pollen_A4.vcf.freq"), header =T)
-freq5 <- read.table(paste0(data,"cross7_58b_36b_pollen_X.vcf.freq"), header =T)
-freq6 <- read.table(paste0(data,"cross7_58b_36b_pollen_Y.vcf.freq"), header =T)
-
-freq_cross7 <- rbind(freq1, freq2, freq3, freq4, freq5, freq6)
-freq_cross7 <- freq_cross7 %>% filter(no_sites > 50)
-freq_cross7$chrom <- factor(freq_cross7$chrom)
-
-freq_long_cross7 <- gather(freq_cross7, Category, freq, dad_freq : pollen_freq, factor_key = TRUE)
-levels(freq_long_cross7$Category) <- c("leaf", "pollen")   
-```
-
-```{r}
-p1 <- ggplot(freq_cross7, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.2)+ geom_smooth(colour = "black")+
-    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab(" ")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p2 <- ggplot(freq_long_cross7, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
-```
 
 
-## seed
-```{r}
-freqseed <- read.table(paste0(data,"cross5_35h_02g_seed.vcf.freq"))
-colnames(freqseed) <- c("chrom", "start", "end","no_sites", "freq_mom", "freq_seed")
-freqseed <- freqseed %>% filter(no_sites > 50)
-freqseed$chrom <- factor(freqseed$chrom)
 
-freqseed_long <- gather(freqseed, Category, freq, freq_mom : freq_seed, factor_key = TRUE)
-levels(freqseed_long$Category) <- c("leaf", "seed")   
-freqseed_long <- freqseed_long %>% filter(chrom != "X" & chrom != "Y")
-```
-
-```{r}
-p1 <- ggplot(freqseed_long, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.2)+ geom_smooth(colour = "black")+
-    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab(" ")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p2 <- ggplot(freqseed_long, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.5)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Ref allele freq.")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
-```
 
