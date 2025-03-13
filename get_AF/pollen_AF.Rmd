@@ -1,8 +1,10 @@
 ---
-title: "pollen AF"
+title: "Allele frequency in leaf and pollen"
 author: "Meng"
-date: "2024-05-18"
-output: html_document
+date: "2025-03-13"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,32 +12,76 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(patchwork)
-setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
-```
-
-# cross 5, TX
-```{r}
-freq_cross <- read.table("cross5_35h_pollen.vcf.freq")
-colnames(freq_cross) <- c("chrom", "start", "end", "no_sites", "leaf_freq", "pollen_freq")
-freq_cross <- freq_cross %>% filter(no_sites > 100)
-freq_cross$chrom <- factor(freq_cross$chrom)
-
-freq_long_cross <- gather(freq_cross, Category, freq, leaf_freq : pollen_freq, factor_key = TRUE)
-levels(freq_long_cross$Category) <- c("leaf", "pollen")   
-```
-
-```{r}
-p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites))+geom_point(size = 0.3, alpha = 0.8, colour = "darkgrey")+ geom_smooth(colour = "black")+
-    facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + 
-    xlab("")+ylab("Number of SNPs")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p2 <- ggplot(freq_long_cross, aes(x = start/1000000, y = freq))+geom_point(aes(colour = Category), size = 0.3, alpha=0.3)+ geom_smooth(aes(colour = Category))+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") +  xlab("Position on Chromosome (Mb)")+ylab("Allele frequency")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 10))
-
-p1 + p2  + plot_layout(nrow = 2, byrow = FALSE)
+data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
 ```
 
 
+Size of sliding window = 1 Mb
+
+All plots show the frequency of the reference allele
+
+```{r echo=FALSE, warning=FALSE}
+plot_AF <- function(row) {
+    id <- row["V1"]
+    male <- row["V2"]
+    
+    # read read counts
+    freq_cross <- read.table(paste0(data, "cross", id , "_", male, "_pollen.vcf.freq"))
+    colnames(freq_cross) <- c("chrom", "start", "end", "no_sites", "leaf_freq", "pollen_freq")
+    freq_cross <- freq_cross %>% filter(no_sites > 100)
+    freq_cross$chrom <- factor(freq_cross$chrom)
+    
+    # prepare for plots
+    freq_long_cross <- gather(freq_cross, Category, freq, leaf_freq:pollen_freq, factor_key = TRUE)
+    levels(freq_long_cross$Category) <- c("leaf", "pollen")
+
+    # SNP density
+    p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites)) +
+        geom_point(size = 0.3, alpha = 0.8, colour = "darkgrey") + 
+        geom_smooth(colour = "black") +
+        facet_grid(.~chrom, scales = "free_x", switch = "x", space = "free_x") + 
+        xlab("") + ylab("Number of SNPs") + 
+        ggtitle(paste0("Male ", id)) + 
+        theme_bw() + 
+        theme(panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(), 
+              axis.ticks.x = element_blank(), 
+              panel.spacing = unit(0.1, "cm"),
+              strip.background = element_blank(), 
+              strip.placement = "outside",
+              text = element_text(size = 10))
+
+    # allele frequency
+    p2 <- ggplot(freq_long_cross, aes(x = start/1000000, y = freq)) +
+        geom_point(aes(colour = Category), size = 0.3, alpha = 0.3) + 
+        geom_smooth(aes(colour = Category)) + 
+        facet_grid(.~chrom, scales = "free_x", switch = "x", space = "free_x") +  
+        xlab("Position on Chromosome (Mb)") + 
+        ylab("Allele frequency") + 
+        theme_bw() + 
+        theme(panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(), 
+              axis.ticks.x = element_blank(), 
+              panel.spacing = unit(0.1, "cm"),
+              strip.background = element_blank(), 
+              strip.placement = "outside",
+              text = element_text(size = 10))
+
+    # plot together
+    final_plot <- p1 + p2 + plot_layout(nrow = 2, byrow = FALSE)
+    
+    return(final_plot)
+}
+
+```
 
 
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+info <- read.table(paste0(data,"pollen_auto_cov.txt"))
+plots <- lapply(1:nrow(info), function(i) plot_AF(info[i, ]))
+for (i in seq_along(plots)) {
+  print(plots[[i]])
+}
+```
 
 
