@@ -17,8 +17,3 @@ while read -r col1 col2 _; do
 done < pollen_auto_cov.txt
 
 
-# perform fisher's exact test on AD of leaf and pollen
-while read -r col1 col2 _; do
-	/usr/local/bin/Rscript --vanilla pollen_AF_test.R "$col1" "$col2"
-done < pollen_auto_cov.txt
-
