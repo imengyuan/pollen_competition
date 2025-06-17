@@ -1,7 +1,7 @@
 ---
 title: "Allele frequency in leaf and pollen"
 author: "Meng"
-date: "2025-03-13"
+date: "2025-06-17"
 output:
   pdf_document: default
   html_document: default
@@ -18,7 +18,7 @@ data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manus
 
 Size of sliding window = 1 Mb
 
-All plots show the frequency of the reference allele
+All plots show the frequency of the minor allele
 
 ```{r echo=FALSE, warning=FALSE}
 plot_AF <- function(row) {
@@ -28,12 +28,14 @@ plot_AF <- function(row) {
     # read read counts
     freq_cross <- read.table(paste0(data, "cross", id , "_", male, "_pollen.vcf.freq"))
     colnames(freq_cross) <- c("chrom", "start", "end", "no_sites", "leaf_freq", "pollen_freq")
+    freq_cross <- freq_cross %>% mutate(leaf_freq = ifelse(leaf_freq <= 0.5, leaf_freq, 1 - leaf_freq)) %>% mutate(pollen_freq = ifelse(pollen_freq <= 0.5, pollen_freq, 1 - pollen_freq)) 
+    
     freq_cross <- freq_cross %>% filter(no_sites > 100)
     freq_cross$chrom <- factor(freq_cross$chrom)
     
     # prepare for plots
     freq_long_cross <- gather(freq_cross, Category, freq, leaf_freq:pollen_freq, factor_key = TRUE)
-    levels(freq_long_cross$Category) <- c("leaf", "pollen")
+    levels(freq_long_cross$Category) <- c("Leaf", "Pollen")
 
     # SNP density
     p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites)) +
@@ -57,7 +59,7 @@ plot_AF <- function(row) {
         geom_smooth(aes(colour = Category)) + 
         facet_grid(.~chrom, scales = "free_x", switch = "x", space = "free_x") +  
         xlab("Position on Chromosome (Mb)") + 
-        ylab("Allele frequency") + 
+        ylab("MAF") + 
         theme_bw() + 
         theme(panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(), 
