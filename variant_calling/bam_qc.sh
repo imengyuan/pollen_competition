@@ -17,24 +17,24 @@ qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam \
 done
 
 # for a plot
-# out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
-# in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
-# for i in "36bSD" "58bPD"
-# do
-# qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam -c \
-# /ohta2/meng.yuan/rumex/pollen_competition/chrom.bed \
-# --java-mem-size=16G -outdir ${out}/${i}
-# done
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+for i in "36bSD" "58bPD"
+do
+qualimap bamqc -bam ${in}/${i}.sorted.rg.dedup.bam -c \
+/ohta2/meng.yuan/rumex/pollen_competition/chrom.bed \
+--java-mem-size=16G -outdir ${out}/${i}
+done
 
 
 # try tinycov for a plot
-# out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
-# in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
-# for i in "36bFLD" "58bMLD" "36bSD" "58bPD"
-# do
-# tinycov covplot ${in}/${i}.sorted.rg.dedup.bam \
-# --out ${out}/${i}.pdf -s 1000 -r 1000000 --whitelist A1,A2,A3,A4,Y,X
-# done
+out=/ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
+in=/ohta2/meng.yuan/rumex/pollen_competition/AnalysisReady_TX
+for i in "36bFLD" "58bMLD" "36bSD" "58bPD"
+do
+tinycov covplot ${in}/${i}.sorted.rg.dedup.bam \
+--out ${out}/${i}.pdf -s 1000 -r 1000000 --whitelist A1,A2,A3,A4,Y,X
+done
 
 
 
@@ -64,16 +64,5 @@ file=${i}/genome_results.txt
 num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
 echo -e "${i}\t${num}" >> $output_file
 done
-
-
-
-
-
-
-
-
-
-
-
 
 
