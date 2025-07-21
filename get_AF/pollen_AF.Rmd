@@ -1,7 +1,7 @@
 ---
 title: "Allele frequency in leaf and pollen"
 author: "Meng"
-date: "2025-06-17"
+date: "2025-07-10"
 output:
   pdf_document: default
   html_document: default
@@ -68,9 +68,15 @@ plot_AF <- function(row) {
               strip.background = element_blank(), 
               strip.placement = "outside",
               text = element_text(size = 10))
+    
+    # p value for contingency test on allelic depth
+    cross <- read.table(paste0(data, "cross", id, "_", male,"_sliding_p_avg.txt"), header = T)
+    cross$chrom <- factor(cross$chrom)
+
+    p3 <- ggplot(cross, aes(x = mid_pos/1000000, y = -log10(p_value_avg)))+geom_point(size = 0.3, alpha=0.3)+geom_smooth()+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + xlab("Position on chromosome (Mb)")+ylab("-log10(p value)")+ggtitle(paste0("Male ", id))+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 11)) 
 
     # plot together
-    final_plot <- p1 + p2 + plot_layout(nrow = 2, byrow = FALSE)
+    final_plot <- p1 + p2 + p3 + plot_layout(nrow = 3, byrow = FALSE)
     
     return(final_plot)
 }
