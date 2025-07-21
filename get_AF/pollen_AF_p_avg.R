@@ -23,11 +23,11 @@ levels(freq_long_cross$Category) <- c("Leaf", "Pollen")
 
 # SNP density
 p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites)) +
-    geom_point(size = 0.3, alpha = 0.8, colour = "darkgrey") + 
+    geom_point(size = 0.3, alpha = 0.5, colour = "darkgrey") + 
     geom_smooth(colour = "black") +
     facet_grid(.~chrom, scales = "free_x", switch = "x", space = "free_x") + 
     xlab("") + ylab("Number of SNPs") + 
-    ggtitle(paste0("Male ", args[1])) + 
+    ggtitle("a") + 
     theme_bw() + 
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), 
@@ -35,13 +35,14 @@ p1 <- ggplot(freq_cross, aes(x = start/1000000, y = no_sites)) +
           panel.spacing = unit(0.1, "cm"),
           strip.background = element_blank(), 
           strip.placement = "outside",
-          text = element_text(size = 11))
+          text = element_text(size = 12))
 
 # allele frequency
 p2 <- ggplot(freq_long_cross, aes(x = start/1000000, y = freq)) +
     geom_point(aes(colour = Category), size = 0.3, alpha = 0.3) + 
     geom_smooth(aes(colour = Category)) + 
     facet_grid(.~chrom, scales = "free_x", switch = "x", space = "free_x") +  
+    ggtitle("b") +
     xlab("") + 
     ylab("MAF") + 
     theme_bw() + 
@@ -51,7 +52,8 @@ p2 <- ggplot(freq_long_cross, aes(x = start/1000000, y = freq)) +
           panel.spacing = unit(0.1, "cm"),
           strip.background = element_blank(), 
           strip.placement = "outside",
-          text = element_text(size = 11))
+          text = element_text(size = 12)) + 
+    scale_colour_manual(values = c("#FF2400", "#0077ec"))
 
 
 
@@ -59,8 +61,21 @@ cross <- read.table(paste0(id,"_sliding_p_avg.txt"), header = T)
 cross <- as.data.table(cross)
 cross$chrom <- factor(cross$chrom)
 
-p3 <- ggplot(cross, aes(x = mid_pos/1000000, y = -log10(p_value_avg)))+geom_point(size = 0.3, alpha=0.3)+geom_smooth()+ facet_grid(.~chrom,scales="free_x", switch = "x", space = "free_x") + xlab("Position on chromosome (Mb)")+ylab("-log10(p value)")+theme_bw() + theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.ticks.x = element_blank(),panel.spacing = unit(0.1, "cm"),strip.background = element_blank(),strip.placement = "outside")+ theme(text = element_text(size = 11)) 
+p3 <- ggplot(cross, aes(x = mid_pos / 1000000, y = -log10(p_value_avg))) + 
+    geom_point(size = 0.3,alpha = 0.5,colour = "darkgrey") +
+    geom_smooth(colour = "black") + 
+    facet_grid(. ~ chrom,scales = "free_x",switch = "x",space = "free_x") + 
+    ggtitle("c") + xlab("Position on chromosome (Mb)") +
+    ylab("-log10(p-value)") + theme_bw() + theme(
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.spacing = unit(0.1, "cm"),
+        strip.background = element_blank(),
+        strip.placement = "outside") + 
+    theme(text = element_text(size = 12))
 
-p <- p1 + p2 + p3 + plot_layout(nrow = 3, byrow = FALSE)
+p <- p1 + p2 + p3 + plot_layout(nrow = 3, byrow = FALSE) & theme(plot.margin = margin())
 
-ggsave(p, filename = paste0(id,"all_plots.png"), device = "png", height = 7.5, width = 10, units = "in")
+ggsave(p, filename = paste0(id,"_all_plots.png"), device = "png", height = 7.5, width = 10, units = "in")
+ggsave(p, filename = paste0(id,"_all_plots.pdf"), device = "pdf", height = 7.5, width = 10, units = "in")
