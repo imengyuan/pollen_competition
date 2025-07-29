@@ -10,7 +10,7 @@ library(dplyr)
 data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
 ```
 
-## compare number of mapped reads on A vs Y in pollen vs leaf 
+## compare number of mapped reads on Y vs autosomes combined in pollen vs leaf 
 ```{r}
 reads <- read.table(paste0(data, "read_counts.tsv"))
 reads <- reads %>% mutate(A = rowSums(reads[,c(2,3,4,5)]))
@@ -39,7 +39,7 @@ test <- chisq.test(table, correct = FALSE)
 ```
 
 
-## compare read counts between X/Y to A
+## compare read counts between X/Y to each autosome
 ```{r}
 reads <- read.table(paste0(data, "read_counts.tsv"))
 colnames(reads) <- c("sample", "A1", "A2", "A3", "A4", "PAR", "Y", "X")
@@ -114,5 +114,19 @@ result_a4 <- t(apply(reads_a4, 1, function(row) {
   test <- chisq.test(table, correct = FALSE)
   c(sample = row[1], p_value = test$p.value)
 }))
+```
+
+## compare read counts between X and Y
+```{r}
+# look at odds ratios first
+pollen <- pollen %>% mutate(pollen_ratio_XY = as.numeric(X)/as.numeric(Y)) 
+
+leaf <- leaf %>% mutate(leaf_ratio_XY = as.numeric(X)/as.numeric(Y)) 
+
+reads <- cbind(pollen[,c(1,8)], leaf[,8])
+colnames(reads)[3] <- "leaf_ratio_XY"
+reads <- reads %>% mutate(OR_XY = pollen_ratio_XY / leaf_ratio_XY)
+write.table(reads, file = paste0(data, "reads_OR_XY.txt"), row.names = F, quote = F)
+
 ```
 
