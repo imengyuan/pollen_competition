@@ -3,7 +3,6 @@ while read -r col1 col2 _; do
 	/usr/local/bin/Rscript --vanilla pollen_AF_test.R "$col1" "$col2"
 done < pollen_auto_cov.txt
 
-
 # only need chrom, pos, p_value for plotting
 while read -r col1 col2 _; do
 	cut -f 1,2,12 cross${col1}_${col2}_test.txt > cross${col1}_${col2}_test.tmp
@@ -15,6 +14,12 @@ while read -r col1 col2 _; do
 	python3 running_avg_p.py cross${col1}_${col2}_test.tmp cross${col1}_${col2}_sliding_p_avg.txt
 done < pollen_auto_cov.txt
 
+# plotting everything together 
 while read -r col1 col2 _; do
 	Rscript --vanilla pollen_AF_p_avg.R "$col1" "$col2"
+done < pollen_auto_cov.txt
+
+# examine raw MAF
+while read -r col1 col2 _; do
+	Rscript --vanilla pollen_raf_maf.R "$col1" "$col2"
 done < pollen_auto_cov.txt
