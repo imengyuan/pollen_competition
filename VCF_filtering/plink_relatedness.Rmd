@@ -1,0 +1,108 @@
+---
+title: "Plink PCA"
+author: "Meng"
+date: "2025-07-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(patchwork)
+library(ggrepel)
+library(ggcorrplot)
+
+data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/plink/"
+```
+
+
+## PCA
+This script is based on https://github.com/SIWLab/Rumex_eQTL/blob/main/plink/plink_PCA.Rmd
+
+/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/plink/TX_40samples_ld.eigenval
+```{r}
+pca <- read.table(paste0(data,"TX_40samples_ld.eigenvec"))
+eigenval <- scan(paste0(data,"TX_40samples_ld.eigenval"))
+# sort out the pca data
+# remove nuisance column
+pca <- pca[,-1]
+# set names
+names(pca)[1] <- "ind"
+names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
+
+# sort out the individual species and pops
+# spp
+tissue <- rep(NA, length(pca$ind))
+tissue[grep("MLD", pca$ind)] <- "MLD"
+tissue[grep("FLD", pca$ind)] <- "FLD"
+tissue[grep("SD", pca$ind)] <- "SD"
+tissue[grep("PD", pca$ind)] <- "PD"
+
+pca <- data.frame(pca, tissue)
+```
+
+
+```{r}
+pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
+cumsum(pve$pve)
+# make plot
+a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")
+a + ylab("Percentage variance explained") + theme_light()
+ggsave(paste0(data, "variance_explained_PC.pdf"))
+```
+
+```{r}
+# plot pca
+b <- ggplot(pca, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6)
+b <- b + scale_colour_manual(values = c("red", "blue", "orange", "purple"))
+b <- b + coord_equal() + theme_light()
+p <- b + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)"))
+ggsave(p, filename = paste0(data, "PCA_40samples.pdf"), device = "pdf")
+```
+
+separate tissues
+```{r}
+pca_FLD <- pca %>% filter(tissue == "FLD")
+pca_MLD <- pca %>% filter(tissue == "MLD")
+pca_SD <- pca %>% filter(tissue == "SD")
+pca_PD <- pca %>% filter(tissue == "PD")
+```
+
+```{r}
+p1 <- ggplot(pca_FLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("red")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+
+p2 <- ggplot(pca_MLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("blue")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+
+p3 <- ggplot(pca_SD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("purple")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+
+p4 <- ggplot(pca_PD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("orange")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+
+p <- p1 + p2 + p3 + p4 + plot_layout(nrow = 2)
+ggsave(p, filename = paste0(data, "PCA_40samples_separate.pdf"), device = "pdf")
+```
+
+
+
+## relatedness matrix
+```{r}
+id <- read.table(paste0(data, "TX_40samples_grm.rel.id"), header = FALSE)
+id<- id$V2  
+
+ncol <- max(count.fields(paste0(data, "TX_40samples_grm.rel"), sep = "\t"))
+tri <- read.table(paste0(data, "TX_40samples_grm.rel"), fill = TRUE, header = FALSE, col.names = id, row.names = id, check.names = F)
+
+
+p <- ggcorrplot(tri, outline.col = "white") + theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1), text = element_text(size = 9))+ xlab("") + ylab("") 
+ggsave(p, filename = paste0(data,"rel_matrix.pdf"), device = "pdf", height = 5, width = 5, units = "in")
+
+```
+
+
+
+
+
+
+
