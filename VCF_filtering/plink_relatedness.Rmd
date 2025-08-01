@@ -58,8 +58,8 @@ ggsave(paste0(data, "variance_explained_PC.pdf"))
 b <- ggplot(pca, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6)
 b <- b + scale_colour_manual(values = c("red", "blue", "orange", "purple"))
 b <- b + coord_equal() + theme_light()
-p <- b + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)"))
-ggsave(p, filename = paste0(data, "PCA_40samples.pdf"), device = "pdf")
+p <- b + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle("a")
+ggsave(p, filename = paste0(data, "PCA_40samples.pdf"), height = 3.5, width = 3.5, unit = "in", device = "pdf")
 ```
 
 separate tissues
@@ -71,13 +71,13 @@ pca_PD <- pca %>% filter(tissue == "PD")
 ```
 
 ```{r}
-p1 <- ggplot(pca_FLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("red")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+p1 <- ggplot(pca_FLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("red")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2) + ggtitle("b")
 
-p2 <- ggplot(pca_MLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("blue")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+p2 <- ggplot(pca_MLD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("blue")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2) + ggtitle("c")
 
-p3 <- ggplot(pca_SD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("purple")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+p3 <- ggplot(pca_SD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("purple")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2) + ggtitle("d")
 
-p4 <- ggplot(pca_PD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("orange")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2)
+p4 <- ggplot(pca_PD, aes(PC1, PC2, col = tissue)) + geom_point(size = 3, alpha = 0.6) + scale_colour_manual(values = c("orange")) + coord_equal() + theme_light() + xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + geom_text_repel(aes(label = ind), size = 2) + ggtitle("e")
 
 p <- p1 + p2 + p3 + p4 + plot_layout(nrow = 2)
 ggsave(p, filename = paste0(data, "PCA_40samples_separate.pdf"), device = "pdf")
