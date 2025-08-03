@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(stringr)
 library(patchwork)
 data <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/"
 setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
@@ -9,6 +10,7 @@ id <- paste0("cross", args[1], "_", args[2])
 
 freq_cross <- read.table(paste0(data, id, "_pollen.vcf"))
 colnames(freq_cross) <- c("chrom", "pos", "ref", "alt", "dad", "dad0", "dad1", "pollen", "pollen0", "pollen1")
+freq_cross <- freq_cross %>% filter(str_starts(chrom, "A"))
 freq_cross <- freq_cross %>% mutate(pollen_raf = pollen0 / (pollen0 + pollen1)) %>% mutate(leaf_raf = dad0 / (dad0 + dad1))
 freq_cross <- freq_cross %>% mutate(pollen_maf = ifelse(pollen_raf <= 0.5, pollen_raf, 1 - pollen_raf)) %>% mutate(leaf_maf = ifelse(leaf_raf <= 0.5, leaf_raf, 1 - leaf_raf)) 
 

@@ -15,16 +15,3 @@ done < pollen_auto_cov.txt
    # 6674863 cross8_48d_pollen.vcf
    # 7259762 cross9_34b_pollen.vcf
 
-# make separate VCF of each chrom for windowed AF analyses
-while read -r col1 col2 _; do
-	for i in "A1" "A2" "A3" "A4"; do
-		grep ${i} cross${col1}_${col2}_pollen.vcf > cross${col1}_${col2}_pollen_${i}.vcf
-		start_pos=$(head -n 1 cross${col1}_${col2}_pollen_${i}.vcf | cut -f2)
-		python3 get_AF_pollen.py cross${col1}_${col2}_pollen_${i}.vcf ${i} ${start_pos}
-	done
-	cat cross${col1}_${col2}_pollen_*.vcf.freq > cross${col1}_${col2}_pollen.vcf.freq
-	rm cross${col1}_${col2}_pollen_A*.vcf
-	rm cross${col1}_${col2}_pollen_A*.vcf.freq
-done < pollen_auto_cov.txt
-
-

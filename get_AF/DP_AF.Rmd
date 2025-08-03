@@ -1,0 +1,151 @@
+---
+title: "pollen AF test"
+author: "Meng"
+date: "2024-05-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(data.table)
+library(stringr)
+setwd("/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/")
+```
+
+## MAF, RAF
+
+```{r}
+freq_cross <- read.table(paste0(data,"cross1_31c_pollen.vcf"))
+colnames(freq_cross) <- c("chrom", "pos", "ref", "alt", "dad", "dad0", "dad1", "pollen", "pollen0", "pollen1")
+freq_cross$chrom <- factor(freq_cross$chrom)
+levels(freq_cross$chrom)
+freq_cross <- freq_cross %>% filter(str_starts(chrom, "A"))
+table(freq_cross$dad)
+table(freq_cross$pollen)
+
+
+freq_cross <- freq_cross %>% mutate(pollen_raf = pollen0 / (pollen0 + pollen1))
+freq_cross <- freq_cross %>% mutate(pollen_maf = ifelse(pollen_raf <= 0.5, pollen_raf, 1 - pollen_raf)) 
+
+
+p<-ggplot(freq_cross, aes(x=pollen_raf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p1 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+  geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("pollen 1 - RAF")+ labs(x="MAF", y="Proportion")+ theme(text = element_text(size = 10))  + expand_limits(x=1) + ylim(0,0.13)
+
+p<-ggplot(freq_cross, aes(x=pollen_maf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p2 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+  geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("pollen 1 - MAF")+ labs(x="MAF", y="Proportion")+ theme(text = element_text(size = 10)) + expand_limits(x=0.5) + ylim(0,0.13)
+p <- p1 + p2 + plot_layout(widths = c(2,1))
+ggsave(p, filename = paste0(data, "pollen1_ref_maf.png"), device = "png", height = 3, width = 6, units = "in")
+```
+
+```{r}
+freq_cross <- freq_cross %>% mutate(leaf_raf = dad0 / (dad0 + dad1))
+freq_cross <- freq_cross %>% mutate(leaf_maf = ifelse(leaf_raf <= 0.5, leaf_raf, 1 - leaf_raf)) 
+
+p<-ggplot(freq_cross, aes(x=leaf_raf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p3 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+  geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("leaf 1 - RAF")+ labs(x="MAF", y="Proportion")+ theme(text = element_text(size = 10))  + expand_limits(x=1) + ylim(0,0.13)
+
+p<-ggplot(freq_cross, aes(x=leaf_maf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p4 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+  geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("leaf 1 - MAF")+ labs(x="MAF", y="Proportion")+ theme(text = element_text(size = 10)) + expand_limits(x=0.5) + ylim(0,0.13)
+
+p <- p1 + p2 + p3 + p4 + plot_layout(ncol = 2, widths = c(2,1))
+#ggsave(p, filename = paste0(data, "leaf_pollen1_ref_maf.png"), device = "png", height = 5, width = 6, units = "in")
+```
+
+
+
+
+## AF - DP
+
+```{r}
+data1 <- "/Users/yuanmeng/Library/CloudStorage/OneDrive-UniversityofToronto/Manuscripts/pollen_competition/new2/"
+
+cross <- read.table(paste0(data1,"cross1_31c_test.txt"), header = T) # 1436151
+cross <- read.table(paste0(data1,"cross1_31c_pollen.filt_test.txt"), header = T) # 1429773
+cross <- read.table(paste0(data1,"cross8_48d_test.txt"), header = T) # 1616366
+
+cross <- cross %>% mutate(pollen_raf = pollen0 / (pollen0 + pollen1))
+
+cross <- cross %>% mutate(pollen_DP = pollen0 + pollen1) %>% mutate(leaf_DP = dad0 + dad1)
+
+mean_leaf_af <- cross %>%
+  group_by(leaf_DP) %>%
+  summarize(mean_leaf_raf = mean(leaf_raf, na.rm = TRUE), 
+            lower = quantile(leaf_raf, 0.025, na.rm = TRUE),
+            upper = quantile(leaf_raf, 0.975, na.rm = TRUE), n = n()) 
+
+
+p1 <- ggplot(cross, aes(leaf_raf)) + geom_histogram(binwidth = 0.001,fill="white", colour="black") + labs(x = "Leaf ref AF", y = "No. of het. SNPs", title = "a") + theme_classic() + xlim(0,1) 
+
+p2 <- ggplot(cross, aes(leaf_DP)) + geom_histogram(binwidth = 1,fill="white", colour="black") + labs(x = "Leaf DP", y = "No. of het. SNPs", title = "b") + theme_classic()
+
+p3 <- ggplot(mean_leaf_af, aes(x = leaf_DP, y = mean_leaf_raf)) +geom_point()+
+    geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.5) +
+    labs(x = "Leaf DP", y = "Leaf ref AF", title = "c")  + theme_classic() 
+
+
+# ggplot(cross, aes(x = leaf_DP, y = pollen_raf)) + geom_point() + ggtitle("c") +
+    # xlab("Leaf DP") + ylab("Leaf ref AF") + theme_classic()
+```
+
+```{r}
+mean_pollen_af <- cross %>%
+  group_by(pollen_DP) %>%
+  summarize(mean_pollen_raf = mean(pollen_raf, na.rm = TRUE), 
+            lower = quantile(pollen_raf, 0.025, na.rm = TRUE),
+            upper = quantile(pollen_raf, 0.975, na.rm = TRUE), n = n()) 
+
+
+p4 <- ggplot(cross, aes(pollen_raf)) + geom_histogram(binwidth = 0.001,fill="white", colour="black") + labs(x = "Pollen ref AF", y = "No. of het. SNPs", title = "d") + theme_classic() + xlim(0,1) 
+
+p5 <- ggplot(cross, aes(pollen_DP)) + geom_histogram(binwidth = 1,fill="white", colour="black") + labs(x = "Pollen DP", y = "No. of het. SNPs", title = "e") + theme_classic()
+
+p6 <- ggplot(mean_pollen_af, aes(x = pollen_DP, y = mean_pollen_raf)) +geom_point()+
+    geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.5) +
+    labs(x = "Pollen DP", y = "Pollen ref AF", title = "f") + 
+    theme_classic()
+
+p <- p1 + p4 + p2 + p5 + p3 + p6 + plot_layout(ncol = 2)
+ggsave(p, filename = paste0(data,"male8_DP_AF.filt.pdf"), device = "pdf", height = 7, width = 7, units = "in")
+
+```
+
+```{r}
+p<-ggplot(cross, aes(x=pollen_raf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p7 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+    geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("")+ labs(x="pollen ref AF", y="Proportion")+ theme(text = element_text(size = 10))  + xlim(0,1) + ylim(0,0.13)
+
+p<-ggplot(cross, aes(x=leaf_raf)) + geom_histogram(binwidth=0.01) 
+p_data <- ggplot_build(p)$data[[1]]
+p_data$y_prop <- p_data$y/sum(p_data$y) 
+
+p8 <- ggplot(p_data, aes(x=x, y=y_prop)) +
+    geom_bar(stat="identity", width = 0.01, color="white")  + theme_classic() + ggtitle("")+ labs(x="leaf ref AF", y="Proportion")+ theme(text = element_text(size = 10))  + xlim(0,1) + ylim(0,0.13)
+
+p7 + p8
+```
+
+
+
+

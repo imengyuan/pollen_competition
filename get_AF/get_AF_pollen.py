@@ -1,5 +1,5 @@
 # calculate AF in pollen and dad in sliding windows
-# usage: python3 get_AF.py XX.vcf A1 1890
+# usage: python3 get_AF_pollen.py XX.vcf A1 1890
 # X       22606   G       A       0/1     5       3       0/1     66      13
 
 import sys
@@ -7,7 +7,7 @@ vcf_file = sys.argv[1]
 out_file = sys.argv[1] + ".freq"
 f_out = open(out_file, "w")
 # print header line of the output
-print('chrom\tstart\tend\tno_sites\tdad_freq\tpollen_freq', file=f_out)
+# print('chrom\tstart\tend\tno_sites\tdad_freq\tpollen_freq', file=f_out)
 
 # assign window size and step size
 window = 1000000  # 1Mb
@@ -42,6 +42,7 @@ with open(vcf_file, "r") as f_in:
             dad_1 += int(record[6])
             pollen_0 += int(record[8])
             pollen_1 += int(record[9])
+            dad_af = dad_0 / (dad_0 + dad_1)
             no_sites += 1
         else:
             start = (n - 1) * step + start_pos
@@ -57,6 +58,7 @@ with open(vcf_file, "r") as f_in:
             dad_1 += int(record[6])
             pollen_0 += int(record[8])
             pollen_1 += int(record[9])
+            dad_af = dad_0 / (dad_0 + dad_1)
             no_sites += 1
 
     # Last window

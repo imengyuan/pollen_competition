@@ -101,4 +101,4 @@ p4 <- ggplot(cross, aes(x = mid_pos / 1000000, y = -log10(p_value_avg))) +
 p <- p1 + plot_spacer() + p2 + plot_spacer() + p3 + plot_spacer() + p4 + plot_layout(ncol = 1, heights = c(5,-2.5,5,-2.5,5,-2.5,5), guides = "collect") & theme(legend.position = "right")
 
 ggsave(p, filename = paste0(id,"_all_plots.png"), device = "png", height = 8, width = 10, units = "in")
-#ggsave(p, filename = paste0(id,"_all_plots.pdf"), device = "pdf", height = 10, width = 10, units = "in")
+ggsave(p, filename = paste0(id,"_all_plots.pdf"), device = "pdf", height = 8, width = 10, units = "in")
