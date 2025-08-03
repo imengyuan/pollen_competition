@@ -37,14 +37,12 @@ tinycov covplot ${in}/${i}.sorted.rg.dedup.bam \
 done
 
 
-
-
 ## get a summary of coverage from bamqc output
 # PD and MLD
 cd /ohta2/meng.yuan/rumex/pollen_competition/bamqc_TX
 
 output_file="PD_auto_coverage.txt" 
-echo -e "sample\t_coverage" > $output_file 
+echo -e "sample\tPD_coverage" > $output_file 
 
 for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/samplePD.txt)
 do
@@ -54,9 +52,8 @@ echo -e "${i}\t${num}" >> $output_file
 done
 
 
-
 output_file="MLD_auto_coverage.txt" 
-echo -e "sample\t_coverage" > $output_file 
+echo -e "sample\t_MLDcoverage" > $output_file 
  
 for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleMLD.txt)
 do
@@ -64,5 +61,31 @@ file=${i}/genome_results.txt
 num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
 echo -e "${i}\t${num}" >> $output_file
 done
+
+# SD and FLD
+output_file="SD_auto_coverage.txt" 
+echo -e "sample\tSD_coverage" > $output_file 
+
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleSD.txt)
+do
+file=${i}/genome_results.txt
+num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
+echo -e "${i}\t${num}" >> $output_file
+done
+
+
+output_file="FLD_auto_coverage.txt" 
+echo -e "sample\tFLD_coverage" > $output_file 
+ 
+for i in $(less /ohta2/meng.yuan/rumex/pollen_competition/sampleFLD.txt)
+do
+file=${i}/genome_results.txt
+num=$(awk '{sum1+=$2; sum2+=$3} END {print sum2/sum1}' <(grep 'A1' ${file}; grep 'A2' ${file}; grep 'A3' ${file}; grep 'A4' ${file}))
+echo -e "${i}\t${num}" >> $output_file
+done
+
+
+
+
 
 

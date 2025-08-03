@@ -20,7 +20,7 @@ vcf_out2=/ohta2/meng.yuan/rumex/pollen_competition/parentage/cross${id}_${male}_
 filter=$(printf 'FMT/DP>50 & FMT/DP<%d' "$DP_seed")
 bcftools view -s "${female}SD" -r A1,A2,A3,A4 ${vcf_in} --threads 20 | \
 bcftools filter -i "$filter" --threads 20 -O z -o ${vcf_seed}
-tabix ${vcf_out_seed}
+tabix ${vcf_seed}
 
 ############### GT1 ###############
 # mom
@@ -36,7 +36,7 @@ bcftools filter -i "$filter" --threads 20 -O z -o ${vcf_dad}
 tabix ${vcf_dad}
 
 # merge  
-bcftools merge ${vcf_out_dad} ${vcf_out_mom} ${vcf_out_seed} --threads 20 | \
+bcftools merge ${vcf_dad} ${vcf_mom} ${vcf_seed} --threads 20 | \
 bcftools filter -e 'FMT/DP="."' | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT\t%AD]\n' > ${vcf_out1}
 
 ############### GT2 ###############
@@ -53,6 +53,6 @@ bcftools filter -i "$filter" --threads 20 -O z -o ${vcf_dad}
 tabix ${vcf_dad}
 
 # merge  
-bcftools merge ${vcf_out_dad} ${vcf_out_mom} ${vcf_out_seed} --threads 20 | \
+bcftools merge ${vcf_dad} ${vcf_mom} ${vcf_seed} --threads 20 | \
 bcftools filter -e 'FMT/DP="."' | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT\t%AD]\n' > ${vcf_out2}
 
