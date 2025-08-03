@@ -16,12 +16,18 @@ fisher_test <- function(dad0, dad1, pollen0, pollen1) {
 
 cross <- read.table(paste0(id,"_pollen.filt.vcf"))
 colnames(cross) <- c("chrom", "pos", "ref", "alt", "dad", "dad0", "dad1", "pollen", "pollen0", "pollen1")
+
+# keep only autosomes 
 cross <- cross %>% filter(str_starts(chrom, "A"))
 
-# remove problematic sites from leaf
+# keep only het SNPs in pollen
+cross <- cross %>% filter(pollen == "0/1")
+
+# remove biased AF from leaf
 cross <- cross %>% mutate(leaf_raf = dad0 / (dad0 + dad1))
 cross <- cross %>% filter(leaf_raf >= 0.45 & leaf_raf <= 0.55)
 
+# compute p values for fisher's text on allelic depth
 cross <- as.data.table(cross)
 cross[, c("odds_ratio", "p_value") := fisher_test(dad0, dad1, pollen0, pollen1), by = 1:nrow(cross)]
 write.table(cross, file=paste0(id,"_test.txt"), quote = F, row.names = F,sep = "\t")

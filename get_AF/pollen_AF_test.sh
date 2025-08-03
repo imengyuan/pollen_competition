@@ -31,7 +31,6 @@ done < pollen_auto_cov.txt
 
 ########################################################
 # make separate VCF of each chrom for windowed AF analyses
-# # cross1_31c_test.txt
 while read -r col1 col2 _; do
 	for i in "A1" "A2" "A3" "A4"; do
 		grep ${i} cross${col1}_${col2}_test.txt > cross${col1}_${col2}_pollen_${i}.vcf
